@@ -131,8 +131,8 @@ void RootFind_Secant(const char* label, float initialGuess, float priorInitialGu
 {
     size_t columnIndex = csv.rows[0].size();
 
-    csv.SetCell(columnIndex + 0, 0, "Secant X  %s [x=%0.2f]", label, initialGuess);
-    csv.SetCell(columnIndex + 1, 0, "Secant Y  %s [x=%0.2f]", label, initialGuess);
+    csv.SetCell(columnIndex + 0, 0, "Secant X  %s [x=%0.2f, px=%0.2f]", label, initialGuess, priorInitialGuess);
+    csv.SetCell(columnIndex + 1, 0, "Secant Y  %s [x=%0.2f, px=%0.2f]", label, initialGuess, priorInitialGuess);
 
     float priorX = priorInitialGuess;
     float priorY = lambdaValue(priorX);
@@ -156,17 +156,26 @@ void RootFind_Bisection(const char* label, float minX, float maxX, CSVFile& csv,
 {
     size_t columnIndex = csv.rows[0].size();
 
-    csv.SetCell(columnIndex + 0, 0, "Bisect X  %s [x=%0.2f]", label, initialGuess);
-    csv.SetCell(columnIndex + 1, 0, "Bisect Y  %s [x=%0.2f]", label, initialGuess);
+    csv.SetCell(columnIndex + 0, 0, "Bisect X  %s [%0.2f, %0.2f]", label, minX);
+    csv.SetCell(columnIndex + 1, 0, "Bisect Y  %s [%0.2f, %0.2f]", label, maxX);
 
     float minY = lambdaValue(minX);
     float maxY = lambdaValue(maxX);
 
+    if (minY > maxY)
+    {
+        std::swap(minX, maxX);
+        std::swap(minY, maxY);
+    }
+
+    // y signs need to be opposite
+    if (minY > 0.0f || maxY < 0.0f)
+        return;
+
     for (size_t iterationIndex = 1; iterationIndex <= c_numIterations; ++iterationIndex)
     {
-        float mid = (min + max) / 2.0f;
-        float y = lambdaValue(mid);
-
+        float midX = (min + max) / 2.0f;
+        float midY = lambdaValue(mid);
 
         float yPrime = (y - priorY) / (x - priorX);  // Secant is just newton using finite differences for 1st derivative!
 
@@ -254,5 +263,6 @@ NOTES:
  * newton needs: f(x), f'(x) and an initial guess.
  * halley needs: f(x), f'(x), f''(x) and an initial guess
  * bisection needs: f(x), min and max, bounding the zero, and having f(min) and f(max) having opposite signs
+  * could just go downhill if they didn't have opposite signs but that'd just be good for finding local minima (optimizing), not zeroes.
 
 */
