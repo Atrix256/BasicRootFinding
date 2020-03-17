@@ -397,7 +397,7 @@ int main(int argc, char** argv)
         csv.SetCell(csv.rows[0].size(), 0, "x^2-x-1");
 
         TestDesc desc;
-        desc.newton = { {0.5f} };
+        desc.newton = { {0.5f}, {0.6f} };  // Note: 0.5 is an error case! 1st derivative is zero there so newton and halley don't move at all and are stuck.
         desc.halley = desc.newton;
         desc.secant = { {0.5f, 0.4f} };
         desc.bisection = { {-1.5f, 0.5f} };
@@ -453,7 +453,7 @@ int main(int argc, char** argv)
     // Optimization: find location of maximum value for the function y = -x^2+x+1
     // So, we find the root of the first derivative of that function to find an extrema, which in this case happens to be the singular maximum.
     // In other functions it could be a minimum, a local maximum (but not the global one), or a saddle point.
-    // It finds a root at x=0.5.  If you plug that into the origional equation, you get a value of 1.25. That is the maximum value of the function.
+    // It finds a root at x=0.5.  If you plug that into the original equation, you get a value of 1.25. That is the maximum value of the function.
     // y = -2x+1
     // y' = -2
     // y'' = 0
@@ -484,8 +484,6 @@ int main(int argc, char** argv)
 
 /*
 
-TODO: golden ratio solution doesn't look right for newton / halley
-
 NOTES:
 * look at your email but also...
  * secant needs: f(x), an initial guess, and a prior initial guess
@@ -494,6 +492,8 @@ NOTES:
  * halley needs: f(x), f'(x), f''(x) and an initial guess
  * bisection needs: f(x), min and max, bounding the zero, and having f(min) and f(max) having opposite signs
   * could just go downhill if they didn't have opposite signs but that'd just be good for finding local minima (optimizing), not zeroes.
+
+! show failure of newton and halley in golden ratio when starting at 0.5, since the 1st derivative is 0, so it doesn't move anywhere!
 
 * show when there's only imaginary roots
 
