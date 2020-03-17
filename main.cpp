@@ -450,6 +450,30 @@ int main(int argc, char** argv)
         );
     }
 
+    // Optimization: find location of maximum value for the function y = -x^2+x+1
+    // So, we find the root of the first derivative of that function to find an extrema, which in this case happens to be the singular maximum.
+    // In other functions it could be a minimum, a local maximum (but not the global one), or a saddle point.
+    // It finds a root at x=0.5.  If you plug that into the origional equation, you get a value of 1.25. That is the maximum value of the function.
+    // y = -2x+1
+    // y' = -2
+    // y'' = 0
+    {
+        // put a blank column, then a label column before the tests
+        csv.SetCell(csv.rows[0].size(), 0, "");
+        csv.SetCell(csv.rows[0].size(), 0, "-2x+1");
+
+        TestDesc desc;
+        desc.newton = { {0.0f} };
+        desc.halley = desc.newton;
+        desc.secant = { {0.0f, 0.1f} };
+        desc.bisection = { {-1.5f, 0.5f} };
+        DoTests(desc, csv,
+            [](float x) { return -2.0f * x + 1.0f; },
+            [](float x) { return -2.0f; },
+            [](float x) { return 0.0f; }
+        );
+    }
+
     // Ray vs Sphere root finding
     RayVsSphereTest(csv);
 
@@ -459,6 +483,8 @@ int main(int argc, char** argv)
 }
 
 /*
+
+TODO: golden ratio solution doesn't look right for newton / halley
 
 NOTES:
 * look at your email but also...
