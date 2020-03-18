@@ -397,9 +397,9 @@ int main(int argc, char** argv)
         csv.SetCell(csv.rows[0].size(), 0, "x^2-x-1");
 
         TestDesc desc;
-        desc.newton = { {0.5f}, {0.6f} };  // Note: 0.5 is an error case! 1st derivative is zero there so newton and halley don't move at all and are stuck.
+        desc.newton = { {0.5f}, {0.75f} };  // Note: 0.5 is an error case! 1st derivative is zero there so newton and halley don't move at all and are stuck.
         desc.halley = desc.newton;
-        desc.secant = { {0.5f, 0.4f} };
+        desc.secant = { {0.75f, 0.7f} };
         desc.bisection = { {-1.5f, 0.5f} };
         DoTests(desc, csv,
             [](float x) { return x * x - x - 1.0f; },
@@ -411,7 +411,6 @@ int main(int argc, char** argv)
     // y = x^4-3x^3-20x-100
     // y' = 4x^3-9x^2-20
     // y'' = 12x^2-18x
-    // AKA calculate the golden ratio
     {
         // put a blank column, then a label column before the tests
         csv.SetCell(csv.rows[0].size(), 0, "");
@@ -481,37 +480,3 @@ int main(int argc, char** argv)
     csv.Save(c_outFileName);
     return 0;
 }
-
-/*
-
-NOTES:
-* look at your email but also...
- * secant needs: f(x), an initial guess, and a prior initial guess
-  * secant is just newton, but using finite differences to get f'(x)
- * newton needs: f(x), f'(x) and an initial guess.
- * halley needs: f(x), f'(x), f''(x) and an initial guess
- * bisection needs: f(x), min and max, bounding the zero, and having f(min) and f(max) having opposite signs
-  * could just go downhill if they didn't have opposite signs but that'd just be good for finding local minima (optimizing), not zeroes.
-
-! show failure of newton and halley in golden ratio when starting at 0.5, since the 1st derivative is 0, so it doesn't move anywhere!
-
-* show when there's only imaginary roots
-
-* multi dimensional root finding - you can extend newton and the others easily enough. Halley getting 2nd derivative would involve a jacobian matrix maybe?
- * ray vs sphere is a simple example. can compare vs numerical method. ? does it take a single newton step since it's linear? so don't even need numerical solution apparently.
- * with a zero second derivative, halley decays to newton. so, lying and saying "0" is the same as just doing newton. Same if it really is 0.
- * ray vs sphere could be ray vs other mathematical shape. Problem is in coming up w/ derivatives. Can use Secant method with numerical derivatives though, or dual numbers.
- * we are doing numerical derivatives, which means newton decays to secant etc.
- * This is sort what we do in sphere marching: https://www.iquilezles.org/www/articles/distance/distance.htm
-  * we get the length of the gradient, and the value at that point, and know that nothing can be closer than how long it would take for the value to reach zero along that gradient.
-
-- if you know the root to a polynomial, can you simplify it?
-
-- if you know a root to a polynomial, can you simplify it for the remaining roots?
-
-
-! put derivation for sphere thing on blog post.
-
-! amazing how well newton does for just a few steps.
-
-*/
